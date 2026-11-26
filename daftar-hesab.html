@@ -38,6 +38,10 @@ button:hover{background:#eaf0fb}
 .positive{color:#09644e}.negative{color:#a02d4c}
 .entry{padding:14px 0}
 #receipt{border-top:4px solid #34598f}
+.receipt-notes,.receipt-attachment{display:flex;align-items:center;flex-wrap:wrap;gap:5px 8px}
+.receipt-attachment{flex-wrap:nowrap;max-width:100%;min-width:0;color:var(--muted);font-size:12px;white-space:normal}
+.receipt-attachment img{width:36px;height:36px;flex:none;border:1px solid var(--line);border-radius:6px;object-fit:contain}
+.receipt-attachment bdi{min-width:0;overflow-wrap:anywhere}
 @media(max-width:390px){.two{grid-template-columns:1fr}}
 @media print{body{background:white}.panel{padding:0;box-shadow:none}#receipt{border:0}}
 </style>
@@ -176,6 +180,7 @@ let entries = [];
 let selected = "";
 let editing;
 let issued;
+let receiptText = "";
 function openLedger() {
   return new Promise((resolve,reject) => {
     const request = indexedDB.open("daftar-hesab-fa-v1",1);
@@ -370,7 +375,32 @@ function renderReceipt() {
       .filter(Boolean).join("\n");
     const values = [showDate(entry.date),kindText(entry),money(BigInt(entry.amount)),notes || "—"];
     const row = body.insertRow();
-    for (const value of values) row.append(element("td",value));
+    for (const value of values.slice(0,3)) row.append(element("td",value));
+    const notesCell = element("td");
+    const noteContent = element("div",undefined,"receipt-notes");
+    if (entry.description) noteContent.append(element("span",entry.description));
+    if (entry.attachment) {
+      const file = entry.attachment;
+      const attachment = element("span",undefined,"receipt-attachment");
+      if (file.type.startsWith("image/") ||
+          (!file.type && /\.(png|jpe?g|webp|gif|heic|heif|bmp|tiff?)$/i.test(file.name))) {
+        const thumbnail = element("img");
+        thumbnail.alt = "";
+        const url = URL.createObjectURL(file);
+        thumbnail.onload = () => URL.revokeObjectURL(url);
+        thumbnail.onerror = () => {
+          URL.revokeObjectURL(url);
+          thumbnail.remove();
+        };
+        thumbnail.src = url;
+        attachment.append(thumbnail);
+      }
+      attachment.append(element("bdi",file.name));
+      noteContent.append(attachment);
+    }
+    if (!notes) noteContent.textContent = "—";
+    notesCell.append(noteContent);
+    row.append(notesCell);
     details.push(values.join(" | "));
   }
   wrapper.append(table);
@@ -388,15 +418,15 @@ byId("addFor").onclick = () => {
 };
 byId("makeReceipt").onclick = () => {
   issued = today();
-  renderReceipt();
+  receiptText = renderReceipt();
   byId("receipt").hidden = false;
   byId("receipt").scrollIntoView({block:"nearest"});
 };
-byId("issuer").oninput = renderReceipt;
+byId("issuer").oninput = () => { receiptText = renderReceipt(); };
 byId("closeReceipt").onclick = () => { byId("receipt").hidden = true; };
-byId("print").onclick = () => { if (renderReceipt()) window.print(); };
+byId("print").onclick = () => { if (receiptText) window.print(); };
 byId("copy").onclick = async () => {
-  const text = renderReceipt();
+  const text = receiptText;
   if (!text) return;
   try {
     await navigator.clipboard.writeText(text);
