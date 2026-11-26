@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>دفتر حساب</title>
+<meta name="theme-color" content="#101d3a">
+<style>
+:root{font-family:Tahoma,Arial,sans-serif;color:#182e29;background:#f4f6f0;line-height:1.65;--green:#174e43;--line:#dce5dc;--muted:#536962}
+*{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:auto;padding:clamp(16px,4vw,48px)}header{background:#103e35;color:#fff;border-radius:24px;padding:28px clamp(20px,4vw,42px);margin-bottom:24px}h1,h2,h3,p{margin:0}h1{font-size:clamp(27px,5vw,42px)}header p{color:#d0e7dc}.layout{display:grid;grid-template-columns:minmax(260px,1fr) minmax(0,1.8fr);gap:20px;align-items:start}.stack{display:grid;gap:16px;min-width:0}.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;min-width:0}.panel h2{font-size:19px;margin-bottom:14px}.fields{display:grid;gap:11px}label{display:grid;gap:4px;font-size:14px}input,select,textarea,button{font:inherit;border-radius:9px}input,select,textarea{width:100%;min-width:0;padding:8px 10px;border:1px solid #aebeb4;color:inherit;background:white}textarea{resize:vertical}button{cursor:pointer;padding:8px 13px;border:1px solid #b5c6bc;background:white;color:var(--green)}button:hover{background:#edf5ef}button:disabled{opacity:.5;cursor:default}.primary{background:var(--green);border-color:var(--green);color:white}.primary:hover{background:#103e35}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.between{justify-content:space-between}.small,small{font-size:13px;color:var(--muted)}.positive{color:#086442}.negative{color:#982f3c}.people{display:grid;gap:7px}.person{text-align:right;width:100%;overflow-wrap:anywhere}.person[aria-pressed=true]{background:#e4f1e8;border-color:#64927f}.entry{border-top:1px solid var(--line);padding:12px 0;overflow-wrap:anywhere}.entry p{white-space:pre-wrap}.entry:last-child{padding-bottom:0}.amount{font-size:20px;font-weight:bold;overflow-wrap:anywhere}.notice{margin-bottom:14px;color:#982f3c}.balance{margin:8px 0 14px}.receipt-table{width:100%;border-collapse:collapse;font-size:14px}.receipt-table th,.receipt-table td{text-align:right;border-bottom:1px solid var(--line);padding:7px;overflow-wrap:anywhere;white-space:pre-wrap}.compact{overflow-x:auto}.receipt-table td:nth-child(3){min-width:95px}.receipt-table td:nth-child(4){max-width:220px}#receipt h3{margin-bottom:8px}.receipt-meta{margin:8px 0}.receipt-total{margin-top:12px}.actions{margin-top:12px}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}[hidden]{display:none!important}
+@media(max-width:730px){.layout{grid-template-columns:1fr}}
+@media print{body{background:white}main{max-width:none;padding:0}main>header,.editor,#accounts,#details,.no-print,#notice{display:none!important}.layout,.stack{display:block}.panel{border:0;padding:0}.receipt-table tr{break-inside:avoid}}
+
+:root{color:#172541;background:#edf1f8;--green:#213c73;--line:#e0e6f0;--muted:#536582}
+body{min-height:100vh;background:linear-gradient(155deg,#e7edf8 0%,#f6f8fc 54%,#edf1f8 100%)}
+main{max-width:1180px}
+header{position:relative;isolation:isolate;overflow:hidden;border-radius:26px;padding:34px clamp(24px,5vw,58px);margin-bottom:22px;background:linear-gradient(115deg,#254478 0%,#172b53 44%,#101d3a 100%);box-shadow:0 14px 30px #12254a24}
+header::before,header::after{content:"";position:absolute;z-index:-1;border:1px solid #a6c6ff32;border-radius:50%;width:310px;height:310px;left:-66px;top:-135px;box-shadow:0 0 0 23px #a6c6ff0d,0 0 0 50px #a6c6ff0a}
+header::after{left:130px;top:76px;width:135px;height:135px;box-shadow:none}
+header p{color:#cfddf8;margin-top:5px}
+.layout{gap:18px}
+.panel{padding:22px;border-radius:20px;box-shadow:0 5px 18px #14284c0b}
+.panel h2{font-size:19px;color:#182e54}
+label{font-weight:600}
+input,select,textarea,button{border-radius:10px}
+input,select,textarea{border-color:#c5d0e2;background:#fbfcff}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid #577fca;outline-offset:2px}
+#date{text-align:center;font-variant-numeric:tabular-nums}
+input[type=file]::file-selector-button{font:inherit;font-size:13px;color:#203968;background:#e8eef9;border:0;border-radius:6px;padding:4px 8px;margin-inline-end:8px}
+button{border-color:#c8d4e8}
+button:hover{background:#eaf0fb}
+.primary{background:#233f76;border-color:#233f76}
+.primary:hover{background:#152b55}
+.person{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;padding:11px 14px}
+.person br{display:none}
+.person[aria-pressed=true]{background:#edf3ff;border-color:#8fa9d6;box-shadow:inset -3px 0 #365a9c}
+.balance{background:#f2f5fb;border-radius:12px;padding:11px 14px}
+.positive{color:#09644e}.negative{color:#a02d4c}
+.entry{padding:14px 0}
+#receipt{border-top:4px solid #34598f}
+@media(max-width:390px){.two{grid-template-columns:1fr}}
+@media print{body{background:white}.panel{padding:0;box-shadow:none}#receipt{border:0}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="header-content"><h1>دفتر حساب</h1><p>ثبت بدهی و طلب به تفکیک افراد</p></div></header>
+<p id="notice" class="notice" role="status" hidden></p>
+<div class="layout">
+<section class="panel editor">
+<h2 id="formTitle">ثبت حساب</h2>
+<form id="form" class="fields">
+<label>نام فرد<input id="person" name="person" list="names" maxlength="100" required><datalist id="names"></datalist></label>
+<div class="two">
+<label>نوع حساب<select id="kind" name="kind"><option value="credit">از او طلب دارم</option><option value="debt">به او بدهکارم</option></select></label>
+<label>تاریخ ثبت (شمسی)<input id="date" name="date" type="text" dir="ltr" inputmode="numeric" maxlength="16" placeholder="۱۴۰۵/۰۹/۰۵" aria-describedby="dateHelp" required><span id="dateHelp" class="small">سال، ماه، روز</span></label>
+</div>
+<label>مبلغ (تومان)<input id="amount" name="amount" inputmode="numeric" maxlength="35" placeholder="مثلاً ۲۵۰٬۰۰۰" required></label>
+<label>شرح<textarea id="description" name="description" rows="2" maxlength="1000"></textarea></label>
+<label>پیوست رسید<input id="attachment" name="attachment" type="file" accept="image/*,.pdf"><span id="attachmentInfo" class="small">عکس یا PDF</span></label>
+<label id="removeLabel" hidden><span><input id="removeAttachment" type="checkbox" style="width:auto"> حذف پیوست فعلی</span></label>
+<div class="row"><button id="save" class="primary" type="submit" disabled>ذخیره</button><button id="cancel" type="button" hidden>انصراف</button></div>
+</form>
+</section>
+<div class="stack">
+<section id="accounts" class="panel"><h2>حساب افراد</h2><div id="people" class="people"></div></section>
+<section id="details" class="panel" hidden>
+<div class="row between"><h2 id="personTitle"></h2><button id="addFor" type="button">ثبت برای این فرد</button></div>
+<p id="balance" class="amount balance"></p>
+<p id="totals" class="small"></p>
+<div class="actions"><button id="makeReceipt" class="primary" type="button" hidden>ساخت رسید طلب</button></div>
+<div id="entries" class="actions"></div>
+</section>
+<section id="receipt" class="panel" hidden>
+<div class="no-print fields">
+<label>نام شما روی رسید<input id="issuer" maxlength="100" placeholder="اختیاری"></label>
+<div class="row"><button id="print" class="primary" type="button">چاپ / ذخیره PDF</button><button id="copy" type="button">کپی متن رسید</button><button id="closeReceipt" type="button">بستن</button></div>
+</div>
+<div id="receiptContent" class="actions"></div>
+</section>
+</div>
+</div>
+</main>
+<script>
+"use strict";
+const byId = id => document.getElementById(id);
+const format = new Intl.NumberFormat("fa-IR");
+const calendar = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+  year:"numeric", month:"long", day:"numeric"
+});
+const money = amount => format.format(amount) + " تومان";
+const showDate = date => calendar.format(new Date(date + "T12:00:00"));
+const today = () => {
+  const now = new Date();
+  return [now.getFullYear(), now.getMonth() + 1, now.getDate()]
+    .map(part => String(part).padStart(2, "0")).join("-");
+};
+const asciiDigits = value => value.replace(/[۰-۹]/g, digit => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+  .replace(/[٠-٩]/g, digit => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)));
+const persianDate = new Intl.DateTimeFormat("en-US-u-ca-persian-nu-latn", {
+  year:"numeric", month:"2-digit", day:"2-digit", timeZone:"UTC"
+});
+function persianParts(date) {
+  const fields = {};
+  for (const {type,value} of persianDate.formatToParts(date)) fields[type] = Number(value);
+  return [fields.year,fields.month,fields.day];
+}
+function dateInputValue(iso) {
+  const digits = "۰۱۲۳۴۵۶۷۸۹";
+  return persianParts(new Date(iso + "T12:00:00Z"))
+    .map((part,index) => String(part).padStart(index ? 2 : 4,"0"))
+    .join("/").replace(/[0-9]/g,digit => digits[Number(digit)]);
+}
+function parsePersianDate(value) {
+  const input = asciiDigits(value.trim());
+  const parts = input.match(/^(\d{4})\s*[\/.-]\s*(\d{1,2})\s*[\/.-]\s*(\d{1,2})$/)
+    || input.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if (!parts) return null;
+  const [,year,month,day] = parts.map(Number);
+  if (year < 1000 || year > 9000 || month < 1 || month > 12 || day < 1 || day > 31) return null;
+  const key = (y,m,d) => y * 10000 + m * 100 + d;
+  const target = key(year,month,day);
+  const dayMs = 86400000;
+  let start = Date.UTC(year + 621,0,1) / dayMs;
+  let end = Date.UTC(year + 623,0,1) / dayMs;
+  while (start <= end) {
+    const middle = Math.floor((start + end) / 2);
+    const date = new Date(middle * dayMs);
+    const candidate = key(...persianParts(date));
+    if (candidate === target) return date.toISOString().slice(0,10);
+    if (candidate < target) start = middle + 1;
+    else end = middle - 1;
+  }
+  return null;
+}
+const normalizeName = name => name.normalize("NFKC").trim().replace(/\s+/g," ")
+  .replace(/ي/g,"ی").replace(/ك/g,"ک").toLocaleLowerCase("fa");
+function parseAmount(value) {
+  const cleaned = value.replace(/[۰-۹]/g, digit => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/[٠-٩]/g, digit => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+    .replace(/[\s٬,،]/g,"");
+  return /^\d{1,30}$/.test(cleaned) && BigInt(cleaned) > 0n ? BigInt(cleaned) : null;
+}
+function summarize(entries) {
+  let credit = 0n;
+  let debt = 0n;
+  for (const entry of entries) {
+    if (entry.kind === "credit") credit += BigInt(entry.amount);
+    else debt += BigInt(entry.amount);
+  }
+  return {credit, debt, net:credit-debt};
+}
+function balanceText(net) {
+  if (net > 0n) return money(net) + " طلبکارم";
+  if (net < 0n) return money(-net) + " بدهکارم";
+  return "تسویه شده";
+}
+const element = (tag, text, className) => {
+  const node = document.createElement(tag);
+  if (text !== undefined) node.textContent = text;
+  if (className) node.className = className;
+  return node;
+};
+const button = (label, action) => {
+  const node = element("button", label);
+  node.type = "button";
+  node.addEventListener("click", action);
+  return node;
+};
+const say = message => {
+  byId("notice").textContent = message;
+  byId("notice").hidden = !message;
+};
+let db;
+let entries = [];
+let selected = "";
+let editing;
+let issued;
+function openLedger() {
+  return new Promise((resolve,reject) => {
+    const request = indexedDB.open("daftar-hesab-fa-v1",1);
+    request.onupgradeneeded = () =>
+      request.result.createObjectStore("entries",{keyPath:"id",autoIncrement:true});
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+    request.onblocked = () => reject(new Error("Database is blocked"));
+  });
+}
+function transact(mode, action) {
+  return new Promise((resolve,reject) => {
+    const transaction = db.transaction("entries",mode);
+    const request = action(transaction.objectStore("entries"));
+    transaction.oncomplete = () => resolve(request.result);
+    transaction.onabort = () => reject(transaction.error || request.error);
+  });
+}
+const groupEntries = () => {
+  const groups = new Map();
+  for (const entry of entries) {
+    const key = normalizeName(entry.person);
+    if (!groups.has(key)) groups.set(key, {name:entry.person, entries:[]});
+    groups.get(key).entries.push(entry);
+  }
+  return groups;
+};
+const selectedGroup = () => groupEntries().get(selected);
+const sortedEntries = group => [...group.entries].sort((a,b) =>
+  b.date.localeCompare(a.date) || b.id - a.id);
+const kindText = entry => entry.kind === "credit" ? "طلب" : "بدهی";
+function downloadAttachment(entry) {
+  const url = URL.createObjectURL(entry.attachment);
+  const link = element("a");
+  link.href = url;
+  link.download = entry.attachment.name || "receipt";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function resetForm(name = "") {
+  editing = undefined;
+  byId("form").reset();
+  byId("person").value = name;
+  byId("date").value = dateInputValue(today());
+  byId("formTitle").textContent = "ثبت حساب";
+  byId("attachmentInfo").textContent = "عکس یا PDF";
+  byId("removeLabel").hidden = true;
+  byId("cancel").hidden = true;
+}
+function editEntry(entry) {
+  resetForm(entry.person);
+  editing = entry;
+  byId("formTitle").textContent = "ویرایش حساب";
+  byId("kind").value = entry.kind;
+  byId("date").value = dateInputValue(entry.date);
+  byId("amount").value = entry.amount;
+  byId("description").value = entry.description;
+  if (entry.attachment) byId("attachmentInfo").textContent = "پیوست فعلی: " + entry.attachment.name;
+  byId("removeLabel").hidden = !entry.attachment;
+  byId("cancel").hidden = false;
+  byId("person").focus();
+}
+async function deleteEntry(entry) {
+  if (!confirm("این ثبت و پیوست آن حذف شود؟")) return;
+  try {
+    await transact("readwrite", store => store.delete(entry.id));
+    if (editing?.id === entry.id) resetForm(entry.person);
+    await refresh();
+  } catch {
+    say("حذف ثبت انجام نشد.");
+  }
+}
+function render() {
+  const groups = groupEntries();
+  if (!groups.has(selected)) selected = groups.keys().next().value || "";
+  const people = byId("people");
+  const names = byId("names");
+  people.replaceChildren();
+  names.replaceChildren();
+  if (!groups.size) people.append(element("p","هنوز حسابی ثبت نشده است.","small"));
+  for (const [key,group] of [...groups].sort((a,b) => a[1].name.localeCompare(b[1].name,"fa"))) {
+    const {net} = summarize(group.entries);
+    const choice = button("", () => {
+      selected = key;
+      byId("receipt").hidden = true;
+      render();
+    });
+    choice.className = "person";
+    choice.setAttribute("aria-pressed",key === selected);
+    choice.append(element("strong",group.name),element("br"),element("span",balanceText(net),
+      net > 0n ? "positive" : net < 0n ? "negative" : "small"));
+    people.append(choice);
+    const option = element("option");
+    option.value = group.name;
+    names.append(option);
+  }
+  const group = groups.get(selected);
+  byId("details").hidden = !group;
+  if (!group) return;
+  const {credit,debt,net} = summarize(group.entries);
+  byId("personTitle").textContent = group.name;
+  byId("balance").textContent = balanceText(net);
+  byId("balance").className = "amount balance " + (net > 0n ? "positive" : net < 0n ? "negative" : "");
+  byId("totals").textContent = "جمع طلب " + money(credit) + " | جمع بدهی " + money(debt);
+  byId("makeReceipt").hidden = net <= 0n;
+  const list = byId("entries");
+  list.replaceChildren();
+  for (const entry of sortedEntries(group)) {
+    const card = element("article",undefined,"entry");
+    const top = element("div",undefined,"row between");
+    top.append(element("strong",kindText(entry) + " " + money(BigInt(entry.amount))),
+      element("time",showDate(entry.date),"small"));
+    card.append(top);
+    if (entry.description) card.append(element("p",entry.description));
+    const actions = element("div",undefined,"row actions");
+    if (entry.attachment) actions.append(button("دانلود پیوست",() => downloadAttachment(entry)));
+    actions.append(button("ویرایش",() => editEntry(entry)),button("حذف",() => deleteEntry(entry)));
+    card.append(actions);
+    list.append(card);
+  }
+}
+async function refresh() {
+  entries = await transact("readonly",store => store.getAll());
+  byId("receipt").hidden = true;
+  render();
+}
+byId("form").addEventListener("submit",async event => {
+  event.preventDefault();
+  const name = byId("person").value.trim().replace(/\s+/g," ");
+  const amount = parseAmount(byId("amount").value);
+  const file = byId("attachment").files[0];
+  if (!name || amount === null) {
+    say("نام فرد و مبلغ صحیحِ بیشتر از صفر را وارد کن.");
+    return;
+  }
+  if (file && !file.type.startsWith("image/") && file.type !== "application/pdf" &&
+      !(!file.type && /\.(pdf|png|jpe?g|webp|gif|heic|heif|bmp|tiff?)$/i.test(file.name))) {
+    say("برای پیوست، عکس یا PDF انتخاب کن.");
+    return;
+  }
+  const date = parsePersianDate(byId("date").value);
+  if (!date) {
+    say("تاریخ شمسی معتبر وارد کن، مثلاً ۱۴۰۵/۰۹/۰۵.");
+    byId("date").focus();
+    return;
+  }
+  const item = {
+    person:groupEntries().get(normalizeName(name))?.name || name,
+    kind:byId("kind").value, amount:amount.toString(), date,
+    description:byId("description").value.trim(),
+    attachment:file || (byId("removeAttachment").checked ? null : editing?.attachment) || null
+  };
+  if (editing) item.id = editing.id;
+  byId("save").disabled = true;
+  say("");
+  try {
+    await transact("readwrite", store => store.put(item));
+    selected = normalizeName(name);
+    resetForm(item.person);
+    await refresh();
+  } catch {
+    say("ذخیره یا خواندن اطلاعات انجام نشد. فضای ذخیره‌سازی و دسترسی مرورگر را بررسی کن.");
+  } finally {
+    byId("save").disabled = false;
+  }
+});
+function renderReceipt() {
+  const group = selectedGroup();
+  if (!group || !issued) return "";
+  const {credit,debt,net} = summarize(group.entries);
+  if (net <= 0n) return "";
+  const issuer = byId("issuer").value.trim();
+  const meta = ["نام طرف حساب: " + group.name,"تاریخ صدور: " + showDate(issued)];
+  if (issuer) meta.push("نام طلبکار: " + issuer);
+  const totals = ["جمع طلب: " + money(credit),"جمع بدهی: " + money(debt),
+    "مانده قابل پرداخت: " + money(net)];
+  const content = byId("receiptContent");
+  content.replaceChildren(element("h3","رسید مانده طلب"));
+  const info = element("div",undefined,"receipt-meta");
+  for (const line of meta) info.append(element("p",line));
+  content.append(info);
+  const wrapper = element("div",undefined,"compact");
+  const table = element("table",undefined,"receipt-table");
+  const header = table.createTHead().insertRow();
+  for (const title of ["تاریخ","نوع","مبلغ","شرح و پیوست"]) header.append(element("th",title));
+  const body = table.createTBody();
+  const details = [];
+  for (const entry of sortedEntries(group).reverse()) {
+    const notes = [entry.description, entry.attachment ? "پیوست: " + entry.attachment.name : ""]
+      .filter(Boolean).join("\n");
+    const values = [showDate(entry.date),kindText(entry),money(BigInt(entry.amount)),notes || "—"];
+    const row = body.insertRow();
+    for (const value of values) row.append(element("td",value));
+    details.push(values.join(" | "));
+  }
+  wrapper.append(table);
+  content.append(wrapper);
+  const total = element("div",undefined,"receipt-total");
+  for (const line of totals.slice(0,2)) total.append(element("p",line));
+  total.append(element("strong",totals[2],"positive"));
+  content.append(total);
+  return ["رسید مانده طلب",...meta,"",...details,"",...totals].join("\n");
+}
+byId("cancel").onclick = () => resetForm(selectedGroup()?.name || "");
+byId("addFor").onclick = () => {
+  resetForm(selectedGroup().name);
+  byId("amount").focus();
+};
+byId("makeReceipt").onclick = () => {
+  issued = today();
+  renderReceipt();
+  byId("receipt").hidden = false;
+  byId("receipt").scrollIntoView({block:"nearest"});
+};
+byId("issuer").oninput = renderReceipt;
+byId("closeReceipt").onclick = () => { byId("receipt").hidden = true; };
+byId("print").onclick = () => { if (renderReceipt()) window.print(); };
+byId("copy").onclick = async () => {
+  const text = renderReceipt();
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    say("متن رسید کپی شد.");
+  } catch {
+    const field = element("textarea");
+    field.value = text;
+    byId("receiptContent").append(field);
+    field.select();
+    if (document.execCommand("copy")) {
+      field.remove();
+      say("متن رسید کپی شد.");
+    } else {
+      say("متن رسید را از کادر پایین کپی کن.");
+    }
+  }
+};
+resetForm();
+openLedger().then(async result => {
+  db = result;
+  await refresh();
+  byId("save").disabled = false;
+}).catch(() => say("مرورگر اجازه ذخیره‌سازی نداد. فایل را در پنجره عادی Chrome یا Edge باز کن."));
+</script>
+</body>
+</html>
